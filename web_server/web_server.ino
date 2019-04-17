@@ -10,6 +10,9 @@
 DHT dht(DHTPIN, DHTTYPE);
 
 const int but_pin = D5;
+const int vert_pin = D7;
+const int jaune_pin = D6;
+const int rouge_pin = D0;
 
 // WEB //
 #include <FS.h> // pour le SPIFFS
@@ -151,6 +154,7 @@ void loop() {
 
   buttonToggleLed();
   delay(100);
+  if(digitalRead(LED_BUILTIN)!=1{
   // if (digitalRead(LED_BUILTIN) != 1) {
     //humidity
     float h = dht.readHumidity();
@@ -175,7 +179,19 @@ void loop() {
     
     //Serial.print("polution: ");
     Serial.println(p);
-  // }
+
+    int lv =(p>75?1:0)+(t>30?1:0)+(h<20?1:0);
+    digitalWrite(vert_pin,0);
+    digitalWrite(jaune_pin,0);
+    digitalWrite(rouge_pin,0);
+    if(lv==1){
+      digitalWrite(jaune_pin,1);
+    }else if(lv>1){
+      digitalWrite(rouge_pin,1);
+    }else{
+      digitalWrite(vert_pin,1);
+    }
+  }
 
   // WEB //
   testRequeteWeb(h, t, p);
@@ -183,7 +199,7 @@ void loop() {
 
 void buttonToggleLed() {
   static bool old_but_state = 0;
-  if (digitalRead(but_pin) == 0 && old_but_state == 1) {
+  if (digitalRead(but_pin) == 1 && old_but_state == 0) {
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
     delay(200);
   }
