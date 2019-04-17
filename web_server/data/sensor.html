@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <meta charset="utf-8" />
+    <title>AJAX Web Page</title>
+        <script>
+        function loadSensorValue() {
+            var uniqueURL = "getStateSensor" + "&aleatoire=" + Math.trunc(Math.random() * 1000000);
+            var request = new XMLHttpRequest(); // http://www.toutjavascript.com/reference/ref-xmlhttprequest.php
+            // la fonction à appeler lors d'un changement d'avancement de la requête AJAX
+            request.onreadystatechange = function() {
+
+                if (this.readyState == 4) { 
+                // Indicateur de l'avancement de l'appel AJAX == 4 => Données complètement accessibles 
+                    if (this.status == 200) { 
+                    // Code retour du serveur après l'appel AJAX == 200 => OK, tout s'est bien passé
+                        if (this.responseText != null) { 
+                            // si on a bien obtenu une réponse non nulle
+                            // alors on remplace le noeud par la réponse
+                            var valueSensor = this.responseText.split(";");
+                            document.getElementById("divValue").innerHTML = JSON.stringify({ 
+                                humidity: valueSensor[0],
+                                temperature : valueSensor[1],
+                                pressure : valueSensor[2]
+                            });  
+                            console.log("Receive " + this.responseText);
+                        }
+                    }
+                }
+            }
+            request.open("GET", uniqueURL , true); // ici on envoie la requête GET sur l'URL /reqEtatBouton
+            request.send(null);
+            setTimeout("loadSensorValue()", 500); // prochaine demande dans 1 seconde, ne pas descendre sous 500
+        }
+        </script>
+    </head>
+        <body onload="loadSensorValue()">
+            <pre>
+                <div id="divValue"></div>
+            </pre>
+        <!-- <script  type="text/javascript">loadSensorValue()</script> -->
+        
+        </body>
+</html>
