@@ -24,26 +24,29 @@ void loop() {
   buttonToggleLed();
   delay(100);
   if (digitalRead(LED_BUILTIN) != 1) {
-    //////////////////////////////////////humidity/temperature//
     //humidity
     float h = dht.readHumidity();
     //temperature
     float t = dht.readTemperature();
+    //pollution//Digital_polution/10 > 75 = aie
+    float p = analogRead (Digital_polution)/10;
      
     // affiché qu'il y a une erreur si une des valeur n'est pas présente
     if (isnan(h) || isnan(t)) {
       Serial.println("Error while reading the sensor");
       return;
     }
-    Serial.print("Humidity(%): ");
-    Serial.println(h);
-    Serial.print("temperature(C): ");
-    Serial.println(t);  
+
+    //Serial.print("Humidity(%): ");
+    Serial.print(h);
+    Serial.print(" ");
     
-    //////////////////////////////////////polution/
-    Serial.print("polution: ");
-    Serial.println(analogRead (Digital_polution));  
-    Serial.println("----------------------------"); 
+    //Serial.print("temperature(C): ");
+    Serial.print(t);  
+    Serial.print(" ");
+    
+    //Serial.print("polution: ");
+    Serial.println(p);
   } 
 }
 
