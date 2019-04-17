@@ -13,7 +13,7 @@ const int but_pin = D5;
 
 // WEB //
 #include <FS.h> // pour le SPIFFS
-const char * nomDeFichier = "/sensor.html";
+const char * nomDeFichier = "/index.html";
 // provient de https://github.com/esp8266/Arduino 
 // télécharger et installer à la main la dernière version
 #include <ESP8266WiFi.h>           
