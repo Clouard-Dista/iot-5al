@@ -45,7 +45,7 @@
 					<td id="gauge-humidite"></td><!-- Humidite-->
 					<td id="gauge-gaz"></td><!-- Gaz-->
 				</tr>
-				<tr>
+				<tr hidden=true>
 					<td style="text-align: center;" id="containerTemperature" style="height: 400px; min-width: 310px"></td>
 					<td style="text-align: center;" id="containerHumidite" style="height: 400px; min-width: 310px"></td>
 					<td style="text-align: center;" id="containerGaz" style="height: 400px; width: 310px"></td>
@@ -349,6 +349,7 @@
 								
 								var x = (new Date()).getTime(); // current time
 									 loadSensorValue(0, (y)=>{
+										console.log("x 0: " , x);
 										console.log("Y 0 : " , y);
 										series.addPoint([x, y], true, true);
 									 });
@@ -425,6 +426,7 @@
 							setInterval(function () {
 								var x = (new Date()).getTime(); // current time
 									 loadSensorValue(1, (y)=>{
+										console.log("x 1: " , x);
 										console.log("Y 1 : " , y);
 										series.addPoint([x, y], true, true);
 									 });
@@ -498,6 +500,7 @@
 							setInterval(function () {
 								var x = (new Date()).getTime(); // current time
 									 loadSensorValue(2, (y)=>{
+										console.log("x 2: " , x);
 										console.log("Y 2 : " , y);
 										series.addPoint([x, y], true, true);
 									 });
