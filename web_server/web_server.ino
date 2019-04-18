@@ -51,7 +51,6 @@ void buttonToggleLed() {
  static bool old_but_state = 0;
   if (digitalRead(but_pin) == 1 && old_but_state == 0) {
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    digitalWrite(power_pin, !digitalRead(LED_BUILTIN));
     digitalWrite(jaune_pin,LOW);
     digitalWrite(rouge_pin,LOW);
     digitalWrite(vert_pin,LOW);
@@ -140,6 +139,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
  
+  digitalWrite(power_pin, HIGH);
   // demare les mesures
   dht.begin();
 
