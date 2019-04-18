@@ -1,9 +1,11 @@
 // Adafruit_DHT library
 #include <DHT.h>
-
+//Include the SSL client
+#include <WiFiClientSecure.h>
 // Declaration input pin
 #define DHTPIN 5 //Temperature+Humidity//
 
+#define INTERVAL_MESSAGE 10000
 // Initialisation capteur
 #define DHTTYPE DHT11   // DHT 11
 #define Digital_polution A0 //polution
@@ -19,7 +21,8 @@ const int rouge_pin = D0;
 const char * nomDeFichier = "/index.html";
 // provient de https://github.com/esp8266/Arduino 
 // télécharger et installer à la main la dernière version
-#include <ESP8266WiFi.h>           
+#include <ESP8266WiFi.h>        
+#include <ESP8266HTTPClient.h>   
 
 const byte maxHTTPLine = 100;    
 char httpLine[maxHTTPLine + 1]; // +1 pour avoir la place du '\0'
@@ -29,7 +32,8 @@ const char* password = "12345678"; // <<--- METTRE ICI VOTRE MOT DE PASSE WIFI
 const uint16_t HTTPPort = 80;
 const byte maxURL = 50;
 char urlRequest[maxURL + 1]; // +1 pour avoir la place du '\0'
-
+long timeThresold = 0;
+WiFiClientSecure clientSecure;
 WiFiServer serveurWeb(HTTPPort); // crée un serveur sur le port HTTP standard
 // FIN WEB //
 void printHTTPServerInfo()
@@ -110,12 +114,9 @@ void testRequeteWeb(float &h ,float &t,float &p)
   } // end while
   delay(1);
   client.stop(); // termine la connexion
-
 }
 
-void setup() {
-
-  
+void setup() {  
   pinMode(but_pin, INPUT_PULLUP);
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
@@ -124,7 +125,7 @@ void setup() {
   dht.begin();
 
   // WEB //
-  Serial.begin(74880); // parce que mon Wemos et par défaut à peu près à cette vitesse, évite les caractères bizarre au boot
+  //Serial.begin(74880); // parce que mon Wemos et par défaut à peu près à cette vitesse, évite les caractères bizarre au boot
   Serial.println("\n\nTest SPIFFS\n");
 
   // on démarre le SPIFSS
@@ -151,11 +152,28 @@ void setup() {
 }
 
 void loop() {
+  HTTPClient http;
+  char str[256];
+  int httpCode;
 
+ // Serial.println("In loop start ...");
+  char* user = "X";
+  char* pass = "X";
+//strcpy(str, "https://smsapi.free-mobile.fr/sendmsg?user=");
+//  strcat(str, user);
+//  strcpy(str, "&pass=");
+//  strcat(str, pass);
+//  strcpy(str, "&msg=");
+  
+
+  char string_h[100];
+  char string_t[100];
+  char string_p[100];  
+  
   buttonToggleLed();
   delay(100);
-  if(digitalRead(LED_BUILTIN)!=1{
-  // if (digitalRead(LED_BUILTIN) != 1) {
+  if(digitalRead(LED_BUILTIN)!=1){
+  
     //humidity
     float h = dht.readHumidity();
     //temperature
@@ -180,21 +198,62 @@ void loop() {
     //Serial.print("polution: ");
     Serial.println(p);
 
-    int lv =(p>75?1:0)+(t>30?1:0)+(h<20?1:0);
+    int lv =(p>75?1:0)+(t>10?1:0)+(h<20?1:0);
+    Serial.print("LV :");
+    Serial.println(lv);
     digitalWrite(vert_pin,0);
     digitalWrite(jaune_pin,0);
     digitalWrite(rouge_pin,0);
     if(lv==1){
       digitalWrite(jaune_pin,1);
+       if(millis() > timeThresold + INTERVAL_MESSAGE){
+            timeThresold = millis();                     
+            gcvt(h,6,string_h);
+            gcvt(t,6,string_t);
+            gcvt(p,6,string_p);
+            char host[] = "https://smsapi.free-mobile.fr";
+            snprintf(str, sizeof str, "GET /sendmsg?user=%s&pass=%s&msg=Temperature%%20%s%%20Humidity%%20:%%20%s%%20%%20Gaz%%20:%%20%s HTTP/1.1", user, pass, string_t, string_h,string_p);
+            //if(clientSecure.connect(host, 443)){
+              Serial.println("Connected to API");
+              clientSecure.println(str);
+              clientSecure.print("Host: "); 
+              clientSecure.println("smsapi.free-mobile.fr");
+              clientSecure.println("User-Agent: arduino/1.0");
+              clientSecure.println("");
+              clientSecure.available();
+              Serial.println("API return ");
+              Serial.println(clientSecure.read());
+              
+            //}else{
+               // Serial.println("Cannot connect to API");
+            //}
+            
+            //Serial.print("URL SMS :");
+            //Serial.println(str);
+            
+//            http.begin(str);
+//            httpCode=http.GET(); 
+//            switch(httpCode){
+//               case 200:  Serial.println("SMS succfuly send"); break;
+//               case 400:  Serial.println("SMS parameter missing"); break;
+//               case 402:  Serial.println("Too many SMS sended"); break;
+//               case 403:  Serial.println("User id or password incorrect "); break;
+//               case 500:  Serial.println("Free server is currently down, retry later"); break;
+//               default:   
+//                  Serial.println("Error unknow"); 
+//                  Serial.print(httpCode);                   
+//                  break;                    
+//            }
+//            http.end();          
+       }      
     }else if(lv>1){
       digitalWrite(rouge_pin,1);
     }else{
       digitalWrite(vert_pin,1);
-    }
-  }
-
-  // WEB //
-  testRequeteWeb(h, t, p);
+    }    
+    // WEB //
+    testRequeteWeb(h, t, p);
+  } 
 }
 
 void buttonToggleLed() {
