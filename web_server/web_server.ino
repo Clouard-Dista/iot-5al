@@ -48,9 +48,13 @@ void printHTTPServerInfo()
 }
 
 void buttonToggleLed() {
-  static bool old_but_state = 0;
+ static bool old_but_state = 0;
   if (digitalRead(but_pin) == 1 && old_but_state == 0) {
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    digitalWrite(power_pin, !digitalRead(LED_BUILTIN));
+    digitalWrite(jaune_pin,LOW);
+    digitalWrite(rouge_pin,LOW);
+    digitalWrite(vert_pin,LOW);
     delay(200);
   }
 
@@ -187,15 +191,19 @@ void loop() {
   
   buttonToggleLed();
   delay(100);
+
+  float h = 0;
+  float t = 0;
+  float p = 0;
   
   if(digitalRead(LED_BUILTIN)!=1){
-  // if (digitalRead(LED_BUILTIN) != 1) {
+ 
     //humidity
-    float h = dht.readHumidity();
+     h = dht.readHumidity();
     //temperature
-    float t = dht.readTemperature();
+     t = dht.readTemperature();
     //pollution//Digital_polution/10 > 75 = aie
-    float p = analogRead (Digital_polution)/10;
+     p = analogRead (Digital_polution)/10;
      
     // affichÃ© qu'il y a une erreur si une des valeur n'est pas prÃ©sente
     if (isnan(h) || isnan(t)) {
@@ -217,15 +225,15 @@ void loop() {
     int lv =(p>75?1:0)+(t>30?1:0)+(h<20?1:0);
     Serial.print("LV :");
     Serial.println(lv);
-    digitalWrite(jaune_pin,0);
-    digitalWrite(rouge_pin,0);
-    digitalWrite(vert_pin,0);
+    digitalWrite(jaune_pin,LOW);
+    digitalWrite(rouge_pin,LOW);
+    digitalWrite(vert_pin,LOW);
 
     if(lv==1){
       digitalWrite(jaune_pin,1);
-    Serial.print("a");
+      Serial.print("a");
 
-     digitalWrite(jaune_pin,1);
+      digitalWrite(jaune_pin,HIGH);
        if(millis() > timeThresold + INTERVAL_MESSAGE){
             timeThresold = millis();                     
             gcvt(h,6,string_h);
@@ -265,14 +273,15 @@ void loop() {
 //                  break;                    
 //            http.end();          
 
+      }
     }else if(lv>1){
-      digitalWrite(rouge_pin,1);
-    Serial.print("b");
+      digitalWrite(rouge_pin,HIGH);
+      Serial.print("b");
     }else{
-      digitalWrite(vert_pin,1);
-    Serial.print("c");
+      digitalWrite(vert_pin,HIGH);
+      Serial.print("c");
     }
-  }
+  
 
   // WEB //
   testRequeteWeb(h, t, p);
