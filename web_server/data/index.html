@@ -13,16 +13,13 @@
 			font-family:  Helvetica, Arial, sans-serif;
 			margin: 32px;
 		}
-
 		#gauge-temperature g.arc,#gauge-humidite g.arc,#gauge-gaz g.arc {
 			fill: steelblue;
 		}
-
 		#gauge-temperature g.pointer,#gauge-humidite g.pointer,#gauge-gaz g.pointer {
 			fill: #e85116;
 			stroke: #b64011;
 		}
-
 		#gauge-temperature g.label text,#gauge-humidite g.label text,#gauge-gaz g.label text {
 			text-anchor: middle;
 			font-size: 14px;
@@ -48,9 +45,18 @@
 					<td id="gauge-humidite"></td><!-- Humidite-->
 					<td id="gauge-gaz"></td><!-- Gaz-->
 				</tr>
+				<tr>
+					<td style="text-align: center;" id="containerTemperature" style="height: 400px; min-width: 310px"></td>
+					<td style="text-align: center;" id="containerHumidite" style="height: 400px; min-width: 310px"></td>
+					<td style="text-align: center;" id="containerGaz" style="height: 400px; width: 310px"></td>
+				</tr>
 			</tbody>
 		</table>
 	</div>
+	
+	<script src="https://code.highcharts.com/stock/highstock.js"></script>
+	<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+	<script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
 	
 		
 	<script>
@@ -92,7 +98,6 @@
 			var ticks = undefined;
 			var tickData = undefined;
 			var pointer = undefined;
-
 			var donut = d3.layout.pie();
 			
 			function deg2rad(deg) {
@@ -114,7 +119,6 @@
 				range = config.maxAngle - config.minAngle;
 				r = config.size / 2;
 				pointerHeadLength = Math.round(r * config.pointerHeadLengthPercent);
-
 				// a linear scale that maps domain values to a percent from 0..1
 				scale = d3.scale.linear()
 					.range([0,1])
@@ -179,7 +183,6 @@
 							return 'rotate(' +newAngle +') translate(0,' +(config.labelInset - r) +')';
 						})
 						.text(config.labelFormat);
-
 				var lineData = [ [config.pointerWidth / 2, 0], 
 								[0, -pointerHeadLength],
 								[-(config.pointerWidth / 2), 0],
@@ -210,22 +213,18 @@
 					.attr('transform', 'rotate(' +newAngle +')');
 			}
 			that.update = update;
-
 			configure(configuration);
 			
 			return that;
 		};
-	</script>
-
-	<script>
-			function onDocumentReady() {
-
-				function loadSensorValue() {
+		
+		
+		function onDocumentReady() {
+				function loadSensorValue(callingFrom) {
 					var uniqueURL = "getStateSensor" + "&aleatoire=" + Math.trunc(Math.random() * 1000000);
 					var request = new XMLHttpRequest(); // http://www.toutjavascript.com/reference/ref-xmlhttprequest.php
 					// la fonction à appeler lors d'un changement d'avancement de la requête AJAX
 					request.onreadystatechange = function() {
-
 						if (this.readyState == 4) { 
 						// Indicateur de l'avancement de l'appel AJAX == 4 => Données complètement accessibles 
 							if (this.status == 200) { 
@@ -233,21 +232,32 @@
 								if (this.responseText != null) { 
 									// si on a bien obtenu une réponse non nulle
 									// alors on remplace le noeud par la réponse
-									sensorReceive =  this.responseText.split(";");									
+									sensorReceive =  this.responseText.split(";");	
 									
 									updateTemperature(sensorReceive[1]);
 									updateHumidite(sensorReceive[0]);
 									updateGaz(sensorReceive[2]);
-									
+									if(0 == callingFrom)
+									{
+										return sensorReceive[1];
+									}
+									else if(1 == callingFrom)
+									{
+										return sensorReceive[0];
+									}
+									else if(2 == callingFrom)
+									{
+										return sensorReceive[2];
+									}									
 									console.log("Receive " + this.responseText);
 								}
 							}
 						}
 					}
-					request.open("GET", uniqueURL , true); // ici on envoie la requête GET sur l'URL /reqEtatBouton
-					request.send(null);
+					// request.open("GET", uniqueURL , true); // ici on envoie la requête GET sur l'URL /reqEtatBouton
+					// request.send(null);
+					
 				}
-
 				//Create temperature gauge
 				var gaugeTemperature = gauge('#gauge-temperature', {
 					size: 300,
@@ -303,13 +313,230 @@
 				// updateTemperature();
 				// updateHumidite();
 				// updateGaz();
-				loadSensorValue();
+				/*loadSensorValue();
 				setInterval(function() {
 					loadSensorValue();				
 					
-				}, 1000);
-		}
+				}, 1000);*/
+			
+			
+			Highcharts.stockChart('containerTemperature', {
+				chart: {
+					events: {
+						load: function () {
 
+							// set up the updating of the chart each second
+							var series = this.series[0];
+							setInterval(function () {
+								var x = (new Date()).getTime(), // current time
+									y = loadSensorValue(0);
+								series.addPoint([x, y], true, true);
+							}, 1000);
+						}
+					}
+				},
+
+				time: {
+					useUTC: false
+				},
+
+				rangeSelector: {
+					buttons: [{
+						count: 1,
+						type: 'minute',
+						text: '1M'
+					}, {
+						count: 5,
+						type: 'minute',
+						text: '5M'
+					}, {
+						type: 'all',
+						text: 'All'
+					}],
+					inputEnabled: false,
+					selected: 0
+				},
+
+				title: {
+					text: 'Data Temperature'
+				},
+
+				exporting: {
+					enabled: false
+				},
+
+				series: [{
+					name: 'data temperature',
+					color: '#C82D07',
+					dataLabels:{
+						color:'#C82D07'
+					},
+					data: (function () {
+						// generate an array of random data
+						var data = [],
+							time = (new Date()).getTime(),
+							i;
+
+						for (i = -999; i <= 0; i += 1) {
+							data.push([
+								time + i * 1000,
+								0
+							]);
+						}
+						return data;
+					}())
+				}]
+			});
+			
+			
+			
+			
+			
+			
+			Highcharts.stockChart('containerHumidite', {
+				chart: {
+					events: {
+						load: function () {
+
+							// set up the updating of the chart each second
+							var series = this.series[0];
+							setInterval(function () {
+								var x = (new Date()).getTime(), // current time
+									y = loadSensorValue(1);
+								series.addPoint([x, y], true, true);
+							}, 1000);
+						}
+					}
+				},
+
+				time: {
+					useUTC: false
+				},
+
+				rangeSelector: {
+					buttons: [{
+						count: 1,
+						type: 'minute',
+						text: '1M'
+					}, {
+						count: 5,
+						type: 'minute',
+						text: '5M'
+					}, {
+						type: 'all',
+						text: 'All'
+					}],
+					inputEnabled: false,
+					selected: 0
+				},
+
+				title: {
+					text: 'Data Humidite'
+				},
+
+				exporting: {
+					enabled: false
+				},
+
+				series: [{
+					name: 'data humidite',					
+					color: '#002bcf',
+					dataLabels:{
+						color:'#002bcf'
+					},
+					data: (function () {
+						// generate an array of random data
+						var data = [],
+							time = (new Date()).getTime(),
+							i;
+
+						for (i = -999; i <= 0; i += 1) {
+							data.push([
+								time + i * 1000,
+								0
+							]);
+						}
+						return data;
+					}())
+				}]
+			});
+			
+			
+			
+			
+			
+			
+			
+			Highcharts.stockChart('containerGaz', {
+				chart: {
+					events: {
+						load: function () {
+
+							// set up the updating of the chart each second
+							var series = this.series[0];
+							setInterval(function () {
+								var x = (new Date()).getTime(), // current time
+									y = loadSensorValue(2);
+								series.addPoint([x, y], true, true);
+							}, 1000);
+						}
+					}
+				},
+
+				time: {
+					useUTC: false
+				},
+
+				rangeSelector: {
+					buttons: [{
+						count: 1,
+						type: 'minute',
+						text: '1M'
+					}, {
+						count: 5,
+						type: 'minute',
+						text: '5M'
+					}, {
+						type: 'all',
+						text: 'All'
+					}],
+					inputEnabled: false,
+					selected: 0
+				},
+
+				title: {
+					text: 'Data Gaz'
+				},
+
+				exporting: {
+					enabled: false
+				},
+
+				series: [{
+					name: 'data gaz',
+					color: '#6f7381',
+					dataLabels:{
+						color:'#6f7381'
+					},
+					data: (function () {
+						// generate an array of random data
+						var data = [],
+							time = (new Date()).getTime(),
+							i;
+
+						for (i = -999; i <= 0; i += 1) {
+							data.push([
+								time + i * 1000,
+								0
+							]);
+						}
+						return data;
+					}())
+				}]
+			});
+			
+			
+		}
 		if ( !window.isLoaded ) {
 			window.addEventListener("load", function() {
 				onDocumentReady();

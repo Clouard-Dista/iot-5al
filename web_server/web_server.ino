@@ -4,17 +4,17 @@
 #include <WiFiClientSecure.h>
 // Declaration input pin
 #define DHTPIN 5 //Temperature+Humidity//
+#define but_pin D5
+#define power_pin D3
+#define vert_pin D7
+#define jaune_pin D6
+#define rouge_pin D0
 
 #define INTERVAL_MESSAGE 10000
 // Initialisation capteur
 #define DHTTYPE DHT11   // DHT 11
 #define Digital_polution A0 //polution
 DHT dht(DHTPIN, DHTTYPE);
-
-const int but_pin = D5;
-const int vert_pin = D7;
-const int jaune_pin = D6;
-const int rouge_pin = D0;
 
 // WEB //
 #include <FS.h> // pour le SPIFFS
@@ -47,6 +47,16 @@ void printHTTPServerInfo()
   Serial.println();
 }
 
+void buttonToggleLed() {
+  static bool old_but_state = 0;
+  if (digitalRead(but_pin) == 1 && old_but_state == 0) {
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    delay(200);
+  }
+
+  //Serial.println(digitalRead(but_pin));
+  old_but_state = digitalRead(but_pin);
+}
 
 void getStateSensor(WiFiClient &cl, float &h , float &t, float &p){
   cl.print(h);
@@ -116,7 +126,12 @@ void testRequeteWeb(float &h ,float &t,float &p)
   client.stop(); // termine la connexion
 }
 
-void setup() {  
+void setup() {
+  
+  pinMode(power_pin, OUTPUT);
+  pinMode(vert_pin, OUTPUT); 
+  pinMode(jaune_pin, OUTPUT); 
+  pinMode(rouge_pin, OUTPUT); 
   pinMode(but_pin, INPUT_PULLUP);
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
@@ -172,8 +187,9 @@ void loop() {
   
   buttonToggleLed();
   delay(100);
-  if(digitalRead(LED_BUILTIN)!=1){
   
+  if(digitalRead(LED_BUILTIN)!=1){
+  // if (digitalRead(LED_BUILTIN) != 1) {
     //humidity
     float h = dht.readHumidity();
     //temperature
@@ -198,14 +214,18 @@ void loop() {
     //Serial.print("polution: ");
     Serial.println(p);
 
-    int lv =(p>75?1:0)+(t>10?1:0)+(h<20?1:0);
+    int lv =(p>75?1:0)+(t>30?1:0)+(h<20?1:0);
     Serial.print("LV :");
     Serial.println(lv);
-    digitalWrite(vert_pin,0);
     digitalWrite(jaune_pin,0);
     digitalWrite(rouge_pin,0);
+    digitalWrite(vert_pin,0);
+
     if(lv==1){
       digitalWrite(jaune_pin,1);
+    Serial.print("a");
+
+     digitalWrite(jaune_pin,1);
        if(millis() > timeThresold + INTERVAL_MESSAGE){
             timeThresold = millis();                     
             gcvt(h,6,string_h);
@@ -243,26 +263,18 @@ void loop() {
 //                  Serial.println("Error unknow"); 
 //                  Serial.print(httpCode);                   
 //                  break;                    
-//            }
 //            http.end();          
-       }      
+
     }else if(lv>1){
       digitalWrite(rouge_pin,1);
+    Serial.print("b");
     }else{
       digitalWrite(vert_pin,1);
-    }    
-    // WEB //
-    testRequeteWeb(h, t, p);
-  } 
-}
-
-void buttonToggleLed() {
-  static bool old_but_state = 0;
-  if (digitalRead(but_pin) == 1 && old_but_state == 0) {
-    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-    delay(200);
+    Serial.print("c");
+    }
   }
 
-  //Serial.println(digitalRead(but_pin));
-  old_but_state = digitalRead(but_pin);
+  // WEB //
+  testRequeteWeb(h, t, p);
+  }
 }
