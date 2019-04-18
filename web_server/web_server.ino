@@ -51,10 +51,16 @@ void buttonToggleLed() {
   static bool old_but_state = 0;
   if (digitalRead(but_pin) == 1 && old_but_state == 0) {
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+<<<<<<< HEAD
     digitalWrite(power_pin, !digitalRead(LED_BUILTIN));
     digitalWrite(jaune_pin, LOW);
     digitalWrite(rouge_pin, LOW);
     digitalWrite(vert_pin, LOW);
+=======
+    digitalWrite(jaune_pin,LOW);
+    digitalWrite(rouge_pin,LOW);
+    digitalWrite(vert_pin,LOW);
+>>>>>>> 731fc52d4e0c592ac0a430dc2fbb8e2a8f0e3d24
     delay(200);
   }
 
@@ -139,7 +145,12 @@ void setup() {
   pinMode(but_pin, INPUT_PULLUP);
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
+<<<<<<< HEAD
 
+=======
+ 
+  digitalWrite(power_pin, HIGH);
+>>>>>>> 731fc52d4e0c592ac0a430dc2fbb8e2a8f0e3d24
   // demare les mesures
   dht.begin();
 
