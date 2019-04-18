@@ -3,16 +3,17 @@
 
 // Declaration input pin
 #define DHTPIN 5 //Temperature+Humidity//
+#define but_pin D5
+#define power_pin D3
+#define vert_pin D7
+#define jaune_pin D6
+#define rouge_pin D0
 
 // Initialisation capteur
 #define DHTTYPE DHT11   // DHT 11
 #define Digital_polution A0 //polution
 DHT dht(DHTPIN, DHTTYPE);
 
-const int but_pin = D5;
-const int vert_pin = D7;
-const int jaune_pin = D6;
-const int rouge_pin = D0;
 
 // WEB //
 #include <FS.h> // pour le SPIFFS
@@ -23,8 +24,8 @@ const char * nomDeFichier = "/index.html";
 
 const byte maxHTTPLine = 100;    
 char httpLine[maxHTTPLine + 1]; // +1 pour avoir la place du '\0'
-const char* ssid = "Sonde"; // <<--- METTRE ICI VOTRE NOM RESEAU WIFI
-const char* password = "12345678"; // <<--- METTRE ICI VOTRE MOT DE PASSE WIFI
+const char* ssid = "Bluebox"; // <<--- METTRE ICI VOTRE NOM RESEAU WIFI
+const char* password = "567891234 pW"; // <<--- METTRE ICI VOTRE MOT DE PASSE WIFI
 
 const uint16_t HTTPPort = 80;
 const byte maxURL = 50;
@@ -114,8 +115,11 @@ void testRequeteWeb(float &h ,float &t,float &p)
 }
 
 void setup() {
-
   
+  pinMode(power_pin, OUTPUT);
+  pinMode(vert_pin, OUTPUT); 
+  pinMode(jaune_pin, OUTPUT); 
+  pinMode(rouge_pin, OUTPUT); 
   pinMode(but_pin, INPUT_PULLUP);
   pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(115200);
@@ -154,14 +158,18 @@ void loop() {
 
   buttonToggleLed();
   delay(100);
-  if(digitalRead(LED_BUILTIN)!=1{
+  
+  float h = 0;
+  float t = 0;
+  float p = 0;
+  if(digitalRead(LED_BUILTIN)!=1){
   // if (digitalRead(LED_BUILTIN) != 1) {
     //humidity
-    float h = dht.readHumidity();
+    h = dht.readHumidity();
     //temperature
-    float t = dht.readTemperature();
+    t = dht.readTemperature();
     //pollution//Digital_polution/10 > 75 = aie
-    float p = analogRead (Digital_polution)/10;
+    p = analogRead (Digital_polution)/10;
      
     // affichÃ© qu'il y a une erreur si une des valeur n'est pas prÃ©sente
     if (isnan(h) || isnan(t)) {
@@ -181,15 +189,19 @@ void loop() {
     Serial.println(p);
 
     int lv =(p>75?1:0)+(t>30?1:0)+(h<20?1:0);
-    digitalWrite(vert_pin,0);
-    digitalWrite(jaune_pin,0);
-    digitalWrite(rouge_pin,0);
+    digitalWrite(jaune_pin,LOW);
+    digitalWrite(rouge_pin,LOW);
+    digitalWrite(vert_pin,LOW);
+
     if(lv==1){
-      digitalWrite(jaune_pin,1);
+      digitalWrite(jaune_pin,HIGH);
+    Serial.print("a");
     }else if(lv>1){
-      digitalWrite(rouge_pin,1);
+      digitalWrite(rouge_pin,HIGH);
+    Serial.print("b");
     }else{
-      digitalWrite(vert_pin,1);
+      digitalWrite(vert_pin,HIGH);
+    Serial.print("c");
     }
   }
 
@@ -201,6 +213,10 @@ void buttonToggleLed() {
   static bool old_but_state = 0;
   if (digitalRead(but_pin) == 1 && old_but_state == 0) {
     digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    digitalWrite(power_pin, !digitalRead(LED_BUILTIN));
+    digitalWrite(jaune_pin,LOW);
+    digitalWrite(rouge_pin,LOW);
+    digitalWrite(vert_pin,LOW);
     delay(200);
   }
 
