@@ -220,11 +220,17 @@
 		
 		
 		function onDocumentReady() {
-				function loadSensorValue(callingFrom) {
+				
+				function loadSensorValue(callingFrom, callback) {
+					console.log(JSON.stringify(callingFrom));
+					var sensorReceive;
+					var aCallingFrom = callingFrom;
+					resultgraph =0;
 					var uniqueURL = "getStateSensor" + "&aleatoire=" + Math.trunc(Math.random() * 1000000);
 					var request = new XMLHttpRequest(); // http://www.toutjavascript.com/reference/ref-xmlhttprequest.php
 					// la fonction à appeler lors d'un changement d'avancement de la requête AJAX
 					request.onreadystatechange = function() {
+					
 						if (this.readyState == 4) { 
 						// Indicateur de l'avancement de l'appel AJAX == 4 => Données complètement accessibles 
 							if (this.status == 200) { 
@@ -235,27 +241,39 @@
 									sensorReceive =  this.responseText.split(";");	
 									
 									updateTemperature(sensorReceive[1]);
-									updateHumidite(sensorReceive[0]);
-									updateGaz(sensorReceive[2]);
-									if(0 == callingFrom)
-									{
-										return sensorReceive[1];
-									}
-									else if(1 == callingFrom)
-									{
-										return sensorReceive[0];
-									}
-									else if(2 == callingFrom)
-									{
-										return sensorReceive[2];
-									}									
+									updateHumidite(sensorReceive[0]);									
+									updateGaz(sensorReceive[2]);			
+									console.log("Calling from " + JSON.stringify(aCallingFrom));									
 									console.log("Receive " + this.responseText);
+									if(0 == aCallingFrom)
+									{
+										console.log("ON 1");
+										callback(sensorReceive[1]);
+									}
+									else if(1 == aCallingFrom)
+									{
+										console.log("ON 0");
+										callback( sensorReceive[0]);
+									}
+									else if(2 == aCallingFrom)
+									{
+										console.log("ON 2");
+										callback( sensorReceive[2]);
+									}else{
+										callback(0);
+									}		
+									console.log("Return " + resultgraph);
 								}
 							}
 						}
 					}
-					// request.open("GET", uniqueURL , true); // ici on envoie la requête GET sur l'URL /reqEtatBouton
-					// request.send(null);
+
+					request.open("GET", uniqueURL , true); // ici on envoie la requête GET sur l'URL 
+					request.send(null);
+					console.log("Return " + resultgraph);
+					
+
+				
 					
 				}
 				//Create temperature gauge
@@ -328,9 +346,13 @@
 							// set up the updating of the chart each second
 							var series = this.series[0];
 							setInterval(function () {
-								var x = (new Date()).getTime(), // current time
-									y = loadSensorValue(0);
-								series.addPoint([x, y], true, true);
+								
+								var x = (new Date()).getTime(); // current time
+									 loadSensorValue(0, (y)=>{
+										console.log("Y 0 : " , y);
+										series.addPoint([x, y], true, true);
+									 });
+								
 							}, 1000);
 						}
 					}
@@ -401,9 +423,12 @@
 							// set up the updating of the chart each second
 							var series = this.series[0];
 							setInterval(function () {
-								var x = (new Date()).getTime(), // current time
-									y = loadSensorValue(1);
-								series.addPoint([x, y], true, true);
+								var x = (new Date()).getTime(); // current time
+									 loadSensorValue(1, (y)=>{
+										console.log("Y 1 : " , y);
+										series.addPoint([x, y], true, true);
+									 });
+								
 							}, 1000);
 						}
 					}
@@ -463,10 +488,6 @@
 			
 			
 			
-			
-			
-			
-			
 			Highcharts.stockChart('containerGaz', {
 				chart: {
 					events: {
@@ -475,9 +496,12 @@
 							// set up the updating of the chart each second
 							var series = this.series[0];
 							setInterval(function () {
-								var x = (new Date()).getTime(), // current time
-									y = loadSensorValue(2);
-								series.addPoint([x, y], true, true);
+								var x = (new Date()).getTime(); // current time
+									 loadSensorValue(2, (y)=>{
+										console.log("Y 2 : " , y);
+										series.addPoint([x, y], true, true);
+									 });
+								
 							}, 1000);
 						}
 					}
