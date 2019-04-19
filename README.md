@@ -103,5 +103,6 @@ The project uses the following libraries :
 Thursday:
 - Issue with LED color to display the good color when a issue arise
 - Issue compatibility between Highchart and D3js to display gauge and graph in a same web application
+- SSL certificat for push SMS push API
 
 

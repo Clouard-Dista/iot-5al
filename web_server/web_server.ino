@@ -186,12 +186,6 @@ void loop() {
   // Serial.println("In loop start ...");
   char* user = "X";
   char* pass = "X";
-  //strcpy(str, "https://smsapi.free-mobile.fr/sendmsg?user=");
-  //  strcat(str, user);
-  //  strcpy(str, "&pass=");
-  //  strcat(str, pass);
-  //  strcpy(str, "&msg=");
-
 
   char string_h[100];
   char string_t[100];
@@ -243,43 +237,7 @@ void loop() {
 
       digitalWrite(jaune_pin, HIGH);
       if (millis() > timeThresold + INTERVAL_MESSAGE) {
-        timeThresold = millis();
-        gcvt(h, 6, string_h);
-        gcvt(t, 6, string_t);
-        gcvt(p, 6, string_p);
-        char host[] = "https://smsapi.free-mobile.fr";
-        snprintf(str, sizeof str, "GET /sendmsg?user=%s&pass=%s&msg=Temperature%%20%s%%20Humidity%%20:%%20%s%%20%%20Gaz%%20:%%20%s HTTP/1.1", user, pass, string_t, string_h, string_p);
-        //if(clientSecure.connect(host, 443)){
-        Serial.println("Connected to API");
-        clientSecure.println(str);
-        clientSecure.print("Host: ");
-        clientSecure.println("smsapi.free-mobile.fr");
-        clientSecure.println("User-Agent: arduino/1.0");
-        clientSecure.println("");
-        clientSecure.available();
-        Serial.println("API return ");
-        Serial.println(clientSecure.read());
-
-        //}else{
-        // Serial.println("Cannot connect to API");
-        //}
-
-        //Serial.print("URL SMS :");
-        //Serial.println(str);
-
-        //            http.begin(str);
-        //            httpCode=http.GET();
-        //            switch(httpCode){
-        //               case 200:  Serial.println("SMS succfuly send"); break;
-        //               case 400:  Serial.println("SMS parameter missing"); break;
-        //               case 402:  Serial.println("Too many SMS sended"); break;
-        //               case 403:  Serial.println("User id or password incorrect "); break;
-        //               case 500:  Serial.println("Free server is currently down, retry later"); break;
-        //               default:
-        //                  Serial.println("Error unknow");
-        //                  Serial.print(httpCode);
-        //                  break;
-        //            http.end();
+        
 
       }
     } else if (lv > 1) {
