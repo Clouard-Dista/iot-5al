@@ -60,26 +60,10 @@ Setup the board :
 
 The project uses the following libraries :
 
-    - Arduino Library
-        - Adafruit_Circuit_Playground
-        - Bridge
-        - Esplora
-        - Ethernet
-        - Firmata
-        - GSM
-        - Keyboard
-        - LiquidCrystal
-        - Mouse
-        - Robot_Control
-        - Robot_Motor
-        - RobotIRremote
-        - SD
-        - Servo
-        - SpacebrewYun
-        - Stepper
-        - Temboo
-        - TFT
-        - WiFi
+    - Arduino
+        - Adafruit Unified Sensors
+        - DHT snsor library
+        - SPIFFSReadServer
     - Web Library:
         - Highchart: Library Js for graphs in Web application
         - D3.js: Library for gauge in application
