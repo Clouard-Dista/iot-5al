@@ -1,4 +1,4 @@
-# Projet IOT : tableau de bord sondes
+# Projet IOT : Sensors Dashboard
 
 > Partcipants : NOIRET Rémy, TALLOIR Vincent, COUVREUR Mathys, LACROIS Gaëtan
 
@@ -8,20 +8,22 @@
 
 Topic of the project have made a thermometer and display:
 
-* Temperature
-* Humidity rates
-* Measure of Propane, Hydrogen, Methane, Gaz de pétrole liquéfié, Dioxyde 'étain.
+* Temperature (in °C)
+* Humidity rates (in %)
+* Measure of Propane, Hydrogen, Methane, Liquefied Petroleum Gas, Tin dioxide (in ppm/10).
 
-A Thermometer is composed a button who allows stop sensor and LED.
+To access the web application go to card_IP/index.html
 
-Data will be display on a Web interface but the device will be make up 3 LED :
+A Thermometer contains button which allows stop sensor and LED.
 
-*  Red: Warning when a issue arise at least 2 sensors.
+Data will be display on a Web interface and the device will contains 3 LED :
+
+*  Red: Warning when a issue arise on at least 2 sensors or if the temperature is over 30°C.
 *  Yellow: Warning when a issue arise with a sensors.
-*  Green: no any issues with sensors.
+*  Green: no issues with sensors.
 
 ## How does it work ?
-At the start, the Arduino card connects a WiFi network and modify SSID and Password in Arduino Code.
+At the start, the Arduino card connect on a WiFi network and modify SSID and Password in Arduino Code.
 
 ![Alt text](img/plan.png?raw=true "jauges")
 
@@ -79,7 +81,7 @@ The project uses the following libraries :
         - TFT
         - WiFi
     - Web Library:
-        - Highchart: Library Js for graphs in application Web
+        - Highchart: Library Js for graphs in Web application
         - D3.js: Library for gauge in application
 
 ## Developpement
@@ -102,7 +104,7 @@ The project uses the following libraries :
 
 Thursday:
 - Issue with LED color to display the good color when a issue arise
-- Issue compatibility between Highchart and D3js to display gauge and graph in a same web application
+- Issue with Highchart due to data being send asynchronously. This feature has been disabled due to lack of time to fix it
 - SSL certificat for push SMS push API
 
 
