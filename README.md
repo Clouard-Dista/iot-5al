@@ -18,9 +18,13 @@ A Thermometer contains button which allows stop sensor and LED.
 
 Data will be display on a Web interface and the device will contains 3 LED :
 
-*  Red: Warning when a issue arise on at least 2 sensors or if the temperature is over 30°C.
+*  Red: Warning when a issue arise on at least 2 sensors
 *  Yellow: Warning when a issue arise with a sensors.
 *  Green: no issues with sensors.
+
+The temperature sencor is consireded to have an issue if the temperature is over 30°C;
+The humidity sensor is considered to have an issue if the humidity is under 20%
+The gaz sensor is considered to have an issue if there is over 750 ppm ( or 75 ppm/10)
 
 ## How does it work ?
 At the start, the Arduino card connect on a WiFi network and modify SSID and Password in Arduino Code.
