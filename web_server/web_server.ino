@@ -12,7 +12,7 @@
 
 #define INTERVAL_MESSAGE 10000
 // Initialisation capteur
-#define DHTTYPE DHT11   // DHT 11
+#define DHTTYPE DHT11   // DHT 11&
 #define Digital_polution A0 //polution
 DHT dht(DHTPIN, DHTTYPE);
 
@@ -233,19 +233,12 @@ void loop() {
 
     if (lv == 1) {
       digitalWrite(jaune_pin, 1);
-      Serial.print("a");
-
       digitalWrite(jaune_pin, HIGH);
-      if (millis() > timeThresold + INTERVAL_MESSAGE) {
-        
-
-      }
+      
     } else if (lv > 1) {
-      digitalWrite(rouge_pin, HIGH);
-      Serial.print("b");
+      digitalWrite(rouge_pin, HIGH);      
     } else {
-      digitalWrite(vert_pin, HIGH);
-      Serial.print("c");
+      digitalWrite(vert_pin, HIGH);      
     }
 
 

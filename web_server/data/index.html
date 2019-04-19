@@ -27,38 +27,6 @@
 			fill: #666;
 		}
 	</style>
-</head>
-<body>
-	<h1>Projet Iot</h1>
-	<div class="table-responsive">
-		<table class="table" align="center">
-			<thead>
-				<tr>
-					<th>Temperature</th>
-					<th>Humidite</th>
-					<th>Gaz</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td id="gauge-temperature"></td><!-- Temperature-->
-					<td id="gauge-humidite"></td><!-- Humidite-->
-					<td id="gauge-gaz"></td><!-- Gaz-->
-				</tr>
-				<tr hidden=true>
-					<td style="text-align: center;" id="containerTemperature" style="height: 400px; min-width: 310px"></td>
-					<td style="text-align: center;" id="containerHumidite" style="height: 400px; min-width: 310px"></td>
-					<td style="text-align: center;" id="containerGaz" style="height: 400px; width: 310px"></td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	
-	<script src="https://code.highcharts.com/stock/highstock.js"></script>
-	<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
-	<script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
-	
-		
 	<script>
 		var gauge = function(container, configuration) {
 			var that = {};
@@ -221,11 +189,9 @@
 		
 		function onDocumentReady() {
 				
-				function loadSensorValue(callingFrom, callback) {
-					console.log(JSON.stringify(callingFrom));
-					var sensorReceive;
-					var aCallingFrom = callingFrom;
-					resultgraph =0;
+				function loadSensorValue() {
+					
+					var sensorReceive;					
 					var uniqueURL = "getStateSensor" + "&aleatoire=" + Math.trunc(Math.random() * 1000000);
 					var request = new XMLHttpRequest(); // http://www.toutjavascript.com/reference/ref-xmlhttprequest.php
 					// la fonction à appeler lors d'un changement d'avancement de la requête AJAX
@@ -239,42 +205,18 @@
 									// si on a bien obtenu une réponse non nulle
 									// alors on remplace le noeud par la réponse
 									sensorReceive =  this.responseText.split(";");	
-									
+									console.log("Receive " + this.responseText);
 									updateTemperature(sensorReceive[1]);
 									updateHumidite(sensorReceive[0]);									
 									updateGaz(sensorReceive[2]);			
-									console.log("Calling from " + JSON.stringify(aCallingFrom));									
-									console.log("Receive " + this.responseText);
-									if(0 == aCallingFrom)
-									{
-										console.log("ON 1");
-										callback(sensorReceive[1]);
-									}
-									else if(1 == aCallingFrom)
-									{
-										console.log("ON 0");
-										callback( sensorReceive[0]);
-									}
-									else if(2 == aCallingFrom)
-									{
-										console.log("ON 2");
-										callback( sensorReceive[2]);
-									}else{
-										callback(0);
-									}		
-									console.log("Return " + resultgraph);
+									
 								}
 							}
 						}
 					}
-
+					
 					request.open("GET", uniqueURL , true); // ici on envoie la requête GET sur l'URL 
-					request.send(null);
-					console.log("Return " + resultgraph);
-					
-
-				
-					
+					request.send(null);					
 				}
 				//Create temperature gauge
 				var gaugeTemperature = gauge('#gauge-temperature', {
@@ -328,240 +270,12 @@
 				}			
 				
 				// every second update all gauges
-				// updateTemperature();
-				// updateHumidite();
-				// updateGaz();
-				/*loadSensorValue();
+				
+				loadSensorValue();
 				setInterval(function() {
 					loadSensorValue();				
 					
-				}, 1000);*/
-			
-			
-			Highcharts.stockChart('containerTemperature', {
-				chart: {
-					events: {
-						load: function () {
-
-							// set up the updating of the chart each second
-							var series = this.series[0];
-							setInterval(function () {
-								
-								var x = (new Date()).getTime(); // current time
-									 loadSensorValue(0, (y)=>{
-										console.log("x 0: " , x);
-										console.log("Y 0 : " , y);
-										series.addPoint([x, y], true, true);
-									 });
-								
-							}, 1000);
-						}
-					}
-				},
-
-				time: {
-					useUTC: false
-				},
-
-				rangeSelector: {
-					buttons: [{
-						count: 1,
-						type: 'minute',
-						text: '1M'
-					}, {
-						count: 5,
-						type: 'minute',
-						text: '5M'
-					}, {
-						type: 'all',
-						text: 'All'
-					}],
-					inputEnabled: false,
-					selected: 0
-				},
-
-				title: {
-					text: 'Data Temperature'
-				},
-
-				exporting: {
-					enabled: false
-				},
-
-				series: [{
-					name: 'data temperature',
-					color: '#C82D07',
-					dataLabels:{
-						color:'#C82D07'
-					},
-					data: (function () {
-						// generate an array of random data
-						var data = [],
-							time = (new Date()).getTime(),
-							i;
-
-						for (i = -999; i <= 0; i += 1) {
-							data.push([
-								time + i * 1000,
-								0
-							]);
-						}
-						return data;
-					}())
-				}]
-			});
-			
-			
-			
-			
-			
-			
-			Highcharts.stockChart('containerHumidite', {
-				chart: {
-					events: {
-						load: function () {
-
-							// set up the updating of the chart each second
-							var series = this.series[0];
-							setInterval(function () {
-								var x = (new Date()).getTime(); // current time
-									 loadSensorValue(1, (y)=>{
-										console.log("x 1: " , x);
-										console.log("Y 1 : " , y);
-										series.addPoint([x, y], true, true);
-									 });
-								
-							}, 1000);
-						}
-					}
-				},
-
-				time: {
-					useUTC: false
-				},
-
-				rangeSelector: {
-					buttons: [{
-						count: 1,
-						type: 'minute',
-						text: '1M'
-					}, {
-						count: 5,
-						type: 'minute',
-						text: '5M'
-					}, {
-						type: 'all',
-						text: 'All'
-					}],
-					inputEnabled: false,
-					selected: 0
-				},
-
-				title: {
-					text: 'Data Humidite'
-				},
-
-				exporting: {
-					enabled: false
-				},
-
-				series: [{
-					name: 'data humidite',					
-					color: '#002bcf',
-					dataLabels:{
-						color:'#002bcf'
-					},
-					data: (function () {
-						// generate an array of random data
-						var data = [],
-							time = (new Date()).getTime(),
-							i;
-
-						for (i = -999; i <= 0; i += 1) {
-							data.push([
-								time + i * 1000,
-								0
-							]);
-						}
-						return data;
-					}())
-				}]
-			});
-			
-			
-			
-			Highcharts.stockChart('containerGaz', {
-				chart: {
-					events: {
-						load: function () {
-
-							// set up the updating of the chart each second
-							var series = this.series[0];
-							setInterval(function () {
-								var x = (new Date()).getTime(); // current time
-									 loadSensorValue(2, (y)=>{
-										console.log("x 2: " , x);
-										console.log("Y 2 : " , y);
-										series.addPoint([x, y], true, true);
-									 });
-								
-							}, 1000);
-						}
-					}
-				},
-
-				time: {
-					useUTC: false
-				},
-
-				rangeSelector: {
-					buttons: [{
-						count: 1,
-						type: 'minute',
-						text: '1M'
-					}, {
-						count: 5,
-						type: 'minute',
-						text: '5M'
-					}, {
-						type: 'all',
-						text: 'All'
-					}],
-					inputEnabled: false,
-					selected: 0
-				},
-
-				title: {
-					text: 'Data Gaz'
-				},
-
-				exporting: {
-					enabled: false
-				},
-
-				series: [{
-					name: 'data gaz',
-					color: '#6f7381',
-					dataLabels:{
-						color:'#6f7381'
-					},
-					data: (function () {
-						// generate an array of random data
-						var data = [],
-							time = (new Date()).getTime(),
-							i;
-
-						for (i = -999; i <= 0; i += 1) {
-							data.push([
-								time + i * 1000,
-								0
-							]);
-						}
-						return data;
-					}())
-				}]
-			});
-			
+				}, 1000);
 			
 		}
 		if ( !window.isLoaded ) {
@@ -572,5 +286,26 @@
 			onDocumentReady();
 		}
 	</script>
-</body>
+</head>
+    <body>
+    	<h1>Projet Iot</h1>
+    	<div class="table-responsive">
+    		<table class="table" align="center">
+    			<thead>
+    				<tr>
+    					<th>Temperature</th>
+    					<th>Humidite</th>
+    					<th>Gaz</th>
+    				</tr>
+    			</thead>
+    			<tbody>
+    				<tr>
+    					<td id="gauge-temperature"></td><!-- Temperature-->
+    					<td id="gauge-humidite"></td><!-- Humidite-->
+    					<td id="gauge-gaz"></td><!-- Gaz-->
+    				</tr>
+    			</tbody>
+    		</table>
+    	</div>	
+    </body>
 </html>
