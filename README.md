@@ -49,7 +49,7 @@ Clone project : <https://github.com/Clouard-Dista/iot-5al.git>
 If you don't have arduino :
 
 1. download it here: https://www.arduino.cc/en/main/software
-2. If you use windows/OSx you will probably need drivers: wiki.wemos.cc/downloads
+2. If you use windows/OSx you will probably need drivers: https://wiki.wemos.cc/downloads
 
 ## Start Arduino IDE
 
