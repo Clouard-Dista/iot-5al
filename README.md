@@ -6,25 +6,27 @@
 
 ## Description
 
-Topic of the project have made a thermometer and display:
+Our project aim is to be able to get thermal, humidity and gas measurement data with sensors and display these data in a webpage with some graph:
 
-* Temperature (in °C)
-* Humidity rates (in %)
+* Temperature (in °C).
+* Humidity rates (in %).
 * Measure of Propane, Hydrogen, Methane, Liquefied Petroleum Gas, Tin dioxide (in ppm/10).
 
-To access the web application go to card_IP/index.html
+To access the web application go to card_IP/index.html.
+The web application is provided with data which can be found in JSON at card_IP/sensor.html.
+Both webpage cant be load simultaneously.
 
 A Thermometer contains button which allows stop sensor and LED.
 
 Data will be display on a Web interface and the device will contains 3 LED :
 
-*  Red: Warning when a issue arise on at least 2 sensors
+*  Red: Warning when a issue arise on at least 2 sensors.
 *  Yellow: Warning when a issue arise with a sensors.
 *  Green: no issues with sensors.
 
-The temperature sencor is consireded to have an issue if the temperature is over 30°C;
-The humidity sensor is considered to have an issue if the humidity is under 20%
-The gaz sensor is considered to have an issue if there is over 750 ppm ( or 75 ppm/10)
+The temperature sencor is consireded to have an issue if the temperature is over 30°C.
+The humidity sensor is considered to have an issue if the humidity is under 20%.
+The gaz sensor is considered to have an issue if there is over 750 ppm ( or 75 ppm/10).
 
 ## How does it work ?
 At the start, the Arduino card connect on a WiFi network and modify SSID and Password in Arduino Code.
@@ -47,7 +49,7 @@ Clone project : <https://github.com/Clouard-Dista/iot-5al.git>
 If you don't have arduino :
 
 1. download it here: https://www.arduino.cc/en/main/software
-2. If you use windows/OSx you will probably need drivers: https://www.wemos.cc/downloads
+2. If you use windows/OSx you will probably need drivers: wiki.wemos.cc/downloads
 
 ## Start Arduino IDE
 
