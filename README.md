@@ -30,8 +30,13 @@ The gaz sensor is considered to have an issue if there is over 750 ppm ( or 75 p
 
 ## How does it work ?
 At the start, the Arduino card connect on a WiFi network and modify SSID and Password in Arduino Code.
+If you need to access externaly you need a static ip adresse and  open http port (80) on your rooter (you can also use a VPN bridge for security reason).
 
 ![Alt text](img/plan.png?raw=true "jauges")
+
+## Demos 
+
+Video : https://drive.google.com/file/d/1anOhr3EHaznXVS37VgCjXTeWFHOaMWAH/view?usp=drivesdk
 
 ## Hardware 
 
@@ -69,7 +74,7 @@ The project uses the following libraries :
     - Arduino
         - Adafruit Unified Sensors
         - DHT snsor library
-        - SPIFFSReadServer
+        - SPIFFSReadServer (see : https://tttapa.github.io/ESP8266/Chap11%20-%20SPIFFS.html for implementation)
     - Web Library:
         - Highchart: Library Js for graphs in Web application
         - D3.js: Library for gauge in application
@@ -96,5 +101,13 @@ Thursday:
 - Issue with LED color to display the good color when a issue arise
 - Issue with Highchart due to data being send asynchronously. This feature has been disabled due to lack of time to fix it
 - SSL certificat for push SMS push API
+
+## Contributions
+
+- Hardware and Adruino code : TALLOIR Vincent
+- Web app : COUVREUR Mathys, LACROIS Gaëtan
+- Arduino code & front binding (SMS API was removed)
+
+
 
 
